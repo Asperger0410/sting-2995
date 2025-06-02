@@ -1,36 +1,69 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
+    <meta charset="UTF-8" />
+    <title>MindAR Scene Switcher</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
     <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+      }
+      #buttons {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        z-index: 999;
+      }
       button {
-        margin: 5px;
+        margin: 3px;
         padding: 10px 15px;
         font-size: 16px;
       }
     </style>
   </head>
   <body>
-    <div>
-      <button onclick="loadScene('a1.mind', 'b1.png')">Card 1</button>
-      <button onclick="loadScene('a2.mind', 'b2.png')">Card 2</button>
-      <button onclick="loadScene('a3.mind', 'b3.png')">Card 3</button>
-      <button onclick="loadScene('a4.mind', 'b4.png')">Card 4</button>
-      <button onclick="loadScene('a5.mind', 'b5.png')">Card 5</button>
-      <button onclick="loadScene('a6.mind', 'b6.png')">Card 6</button>
+    <!-- Buttons to switch cards -->
+    <div id="buttons">
+      <button onclick="loadSceneById('1')">Card 1</button>
+      <button onclick="loadSceneById('2')">Card 2</button>
+      <button onclick="loadSceneById('3')">Card 3</button>
+      <button onclick="loadSceneById('4')">Card 4</button>
+      <button onclick="loadSceneById('5')">Card 5</button>
+      <button onclick="loadSceneById('6')">Card 6</button>
     </div>
 
+    <!-- Scene container -->
     <div id="scene-container"></div>
 
     <script>
-      function loadScene(mindFile, imgSrc) {
-        // Stop current scene if any
-        const container = document.getElementById('scene-container');
-        container.innerHTML = '';
+      // Mapping between MindAR files and their corresponding images
+      const sceneMap = {
+        '1': { mind: 'a1.mind', image: 'b1.png' },
+        '2': { mind: 'a2.mind', image: 'b2.png' },
+        '3': { mind: 'a3.mind', image: 'b3.png' },
+        '4': { mind: 'a4.mind', image: 'b4.png' },
+        '5': { mind: 'a5.mind', image: 'b5.png' },
+        '6': { mind: 'a6.mind', image: 'b6.png' }
+      };
 
-        // Create a new scene
+      // Load scene by ID (from button click)
+      function loadSceneById(id) {
+        const mapping = sceneMap[id];
+        if (!mapping) {
+          console.error('Invalid scene ID:', id);
+          return;
+        }
+        loadScene(mapping.mind, mapping.image);
+      }
+
+      // Load and inject an a-scene with given mind + image
+      function loadScene(mindFile, imgSrc) {
+        const container = document.getElementById('scene-container');
+        container.innerHTML = ''; // Clear previous scene
+
         const sceneHTML = `
           <a-scene mindar-image="imageTargetSrc: ${mindFile};" embedded
             color-space="sRGB"
@@ -38,15 +71,15 @@
             vr-mode-ui="enabled: false"
             light="defaultLightsEnabled: false"
             device-orientation-permission-ui="enabled: false">
-
+            
             <a-assets>
               <img id="card" src="${imgSrc}" />
             </a-assets>
 
             <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-            <a-entity mindar-image-target="targetIndex: 0">
-              <a-plane src="#card" position="0 0 0" rotation="0 0 0"></a-plane>
+            <a-entity mindar-image-target="targetIndex: 0" light="type: ambient; intensity: 1;">
+              <a-plane src="#card" position="0 0 0" rotation="0 0 0" height="1" width="1"></a-plane>
             </a-entity>
           </a-scene>
         `;
@@ -54,9 +87,8 @@
         container.innerHTML = sceneHTML;
       }
 
-      // Load first scene by default
-      window.onload = () => loadScene('a1.mind', 'b1.png');
+      // Load the first scene by default on page load
+      window.onload = () => loadSceneById('1');
     </script>
   </body>
 </html>
-
