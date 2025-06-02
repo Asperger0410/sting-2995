@@ -1,87 +1,62 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html>
   <head>
-    <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>MindAR 多目標示範</title>
     <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
     <style>
-      body {
-        margin: 0;
-        overflow: hidden;
-        font-family: sans-serif;
-      }
-      #loading {
-        position: absolute;
-        top: 10px;
-        left: 10px;
-        background: rgba(255, 255, 255, 0.9);
+      button {
+        margin: 5px;
         padding: 10px 15px;
-        z-index: 999;
         font-size: 16px;
-        border-radius: 5px;
       }
     </style>
   </head>
   <body>
-    <div id="loading">🔍 載入中，請對準圖卡...</div>
+    <div>
+      <button onclick="loadScene('a1.mind', 'b1.png')">Card 1</button>
+      <button onclick="loadScene('a2.mind', 'b2.png')">Card 2</button>
+      <button onclick="loadScene('a3.mind', 'b3.png')">Card 3</button>
+      <button onclick="loadScene('a4.mind', 'b4.png')">Card 4</button>
+      <button onclick="loadScene('a5.mind', 'b5.png')">Card 5</button>
+      <button onclick="loadScene('a6.mind', 'b6.png')">Card 6</button>
+    </div>
 
-    <a-scene
-      mindar-image="imageTargetSrc: targets.mind"
-      color-space="sRGB"
-      renderer="colorManagement: true; physicallyCorrectLights: true"
-      embedded
-      vr-mode-ui="enabled: false"
-      device-orientation-permission-ui="enabled: false"
-    >
-      <a-assets>
-        <img id="img1" src="b1.png" />
-        <img id="img2" src="b2.png" />
-        <img id="img3" src="b3.png" />
-        <img id="img4" src="b4.png" />
-        <img id="img5" src="b5.png" />
-        <img id="img6" src="b6.png" />
-      </a-assets>
-
-      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
-
-      <!-- 對應不同 targetIndex，顯示對應圖片 -->
-      <a-entity mindar-image-target="targetIndex: 0">
-        <a-plane src="#img1" position="0 0 0" height="1" width="1"></a-plane>
-      </a-entity>
-
-      <a-entity mindar-image-target="targetIndex: 1">
-        <a-plane src="#img2" position="0 0 0" height="1" width="1"></a-plane>
-      </a-entity>
-
-      <a-entity mindar-image-target="targetIndex: 2">
-        <a-plane src="#img3" position="0 0 0" height="1" width="1"></a-plane>
-      </a-entity>
-
-      <a-entity mindar-image-target="targetIndex: 3">
-        <a-plane src="#img4" position="0 0 0" height="1" width="1"></a-plane>
-      </a-entity>
-
-      <a-entity mindar-image-target="targetIndex: 4">
-        <a-plane src="#img5" position="0 0 0" height="1" width="1"></a-plane>
-      </a-entity>
-
-      <a-entity mindar-image-target="targetIndex: 5">
-        <a-plane src="#img6" position="0 0 0" height="1" width="1"></a-plane>
-      </a-entity>
-    </a-scene>
+    <div id="scene-container"></div>
 
     <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        const scene = document.querySelector("a-scene");
-        scene.addEventListener("loaded", () => {
-          const mindarComponent = scene.components["mindar-image"];
-          mindarComponent.start().then(() => {
-            document.getElementById("loading").style.display = "none";
-          });
-        });
-      });
+      function loadScene(mindFile, imgSrc) {
+        // Stop current scene if any
+        const container = document.getElementById('scene-container');
+        container.innerHTML = '';
+
+        // Create a new scene
+        const sceneHTML = 
+          <a-scene mindar-image="imageTargetSrc: ${mindFile};" embedded
+            color-space="sRGB"
+            renderer="colorManagement: true; physicallyCorrectLights: true"
+            vr-mode-ui="enabled: false"
+            light="defaultLightsEnabled: false"
+            device-orientation-permission-ui="enabled: false">
+
+            <a-assets>
+              <img id="card" src="${imgSrc}" />
+            </a-assets>
+
+            <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+            <a-entity mindar-image-target="targetIndex: 0">
+              <a-plane src="#card" position="0 0 0" rotation="0 0 0"></a-plane>
+            </a-entity>
+          </a-scene>
+        ;
+
+        container.innerHTML = sceneHTML;
+      }
+
+      // Load first scene by default
+      window.onload = () => loadScene('a1.mind', 'b1.png');
     </script>
   </body>
 </html>
+
